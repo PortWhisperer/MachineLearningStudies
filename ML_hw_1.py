@@ -41,14 +41,14 @@ gradient,intercept,r_value,p_value,std_err=stats.linregress(x_i,y_i)
 
 rmse_val = [] # to store rmse values for different k
 rmse_val_train = []
-for K in range(2,82):
+for K in range(1,81):
     K = K+1
     model = neighbors.KNeighborsRegressor(n_neighbors = K)
 
     model.fit(x_i.reshape(-1, 1), y_i.reshape(-1, 1))  # fit the model
     pred, pred_train = model.predict(x_i_test.reshape(-1, 1)), model.predict(x_i.reshape(-1, 1))  # make prediction on test set
-    error = sqrt(mean_squared_error(true_fx_y_vals, pred))  # calculate rmse against test data
-    train_error = sqrt(mean_squared_error(true_fx_yvals_trainset, pred_train)) # calculate mse against training data
+    error = sqrt(mean_squared_error(y_i_test, pred))  # calculate rmse against test data using y hat, not f(x)
+    train_error = sqrt(mean_squared_error(y_i, pred_train)) # calculate mse against training data
     rmse_val.append(error)  # store rmse values
     rmse_val_train.append(train_error)
     print('RMSE value for k= ' , K , 'is:', error)  # k=30 has lowest RMSE
@@ -56,7 +56,7 @@ for K in range(2,82):
     #calculate MSE against test data
     #y_i_test
 
-x = numpy.linspace(2,82,80)
+x = numpy.linspace(1,81,80)
 
 matplotlib.pyplot.plot(numpy.log(1.0/x), numpy.array(rmse_val), c='r', label = 'RMSE')
 matplotlib.pyplot.plot(numpy.log(1.0/x), numpy.array(rmse_val_train), c='black', label ='In sample RMSE')
