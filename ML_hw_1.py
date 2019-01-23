@@ -5,6 +5,7 @@ from sklearn import neighbors
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 
+
 numpy.random.seed(10)
 
 # given f(x) = 1.8*x_i + 2
@@ -41,28 +42,57 @@ gradient,intercept,r_value,p_value,std_err=stats.linregress(x_i,y_i)
 
 rmse_val = [] # to store rmse values for different k
 rmse_val_train = []
-for K in range(1,81):
+for K in range(1, 16):
     K = K+1
-    model = neighbors.KNeighborsRegressor(n_neighbors = K)
 
-    model.fit(x_i.reshape(-1, 1), y_i.reshape(-1, 1))  # fit the model
-    pred, pred_train = model.predict(x_i_test.reshape(-1, 1)), model.predict(x_i.reshape(-1, 1))  # make prediction on test set
+    model = neighbors.KNeighborsRegressor(n_neighbors = K) # create the model
+    model.fit(x_i.reshape(-1, 1), y_i.reshape(-1, 1))  # fit the KNN model
+
+    pred  = model.predict(x_i_test.reshape(-1, 1))
+    pred_train = model.predict(x_i.reshape(-1, 1))  # make prediction on test set
+
+
     error = sqrt(mean_squared_error(y_i_test, pred))  # calculate rmse against test data using y hat, not f(x)
-    train_error = sqrt(mean_squared_error(y_i, pred_train)) # calculate mse against training data
+    error_train = sqrt(mean_squared_error(y_i, pred_train)) # calculate mse against training data
+
+
     rmse_val.append(error)  # store rmse values
-    rmse_val_train.append(train_error)
-    print('RMSE value for k= ' , K , 'is:', error)  # k=30 has lowest RMSE
-    print('In-Sample RMSE value for k= ', K, 'is:', train_error)  # k=30 has lowest RMSE
-    #calculate MSE against test data
-    #y_i_test
+    rmse_val_train.append(error_train)
 
-x = numpy.linspace(1,81,80)
+# Run linear regression model
+# ###########################
+lin_reg_model_test = numpy.polyfit(x_i, y_i, deg=1)
+lin_reg_model_train = numpy.polyfit(x_i_test, y_i_test, deg=1)
 
-matplotlib.pyplot.plot(numpy.log(1.0/x), numpy.array(rmse_val), c='r', label = 'RMSE')
-matplotlib.pyplot.plot(numpy.log(1.0/x), numpy.array(rmse_val_train), c='black', label ='In sample RMSE')
-matplotlib.pyplot.legend(loc='upper left')
-matplotlib.pyplot.xlabel('Log(1/k)')
-matplotlib.pyplot.ylabel('RMSE')
+lin_reg_model_pred_train = lin_reg_model_train[0] * numpy.linspace(-1, 1, 100) + lin_reg_model_train[1]
+lin_reg_model_pred_test = lin_reg_model_test[0] * numpy.linspace(-1, 1, 10000) + lin_reg_model_test[1]
+
+error_lin_reg_test = sqrt(mean_squared_error(y_i_test, lin_reg_model_pred_test))  # out of sample RMSE = 1.0233
+error_lin_reg_train = sqrt(mean_squared_error(y_i, lin_reg_model_pred_train))  # in sample RMSE = .93796
+
+# plot results
+# RMSE vs log(k)
+k = numpy.linspace(1.0, 15.0, 15)  # create for matplotlib plotting purposes
+fig, (ax1, ax2) = matplotlib.pyplot.subplots(2, 1) # create subplots
+fig.subplots_adjust(hspace=0.5)
+
+ax1.plot(numpy.log(1.0 / k), numpy.array(rmse_val), c='r', label='RMSE')
+ax1.plot(numpy.log(1.0 / k), numpy.array(rmse_val_train), c='black', label='In sample RMSE')
+ax1.axhline(y=error_lin_reg_test, c='g', dashes=(5,1), label="Lin Reg RMSE")
+
+
+ax1.set_xlabel('Log(1/k)')
+ax1.set_ylabel('RMSE')
+ax1.legend(loc='upper left')
+
+# RMSE vs K
+ax2.plot(k, numpy.array(rmse_val), c='r', label='RMSE')
+ax2.plot(k, numpy.array(rmse_val_train), c='black', label='In sample RMSE')
+ax2.axhline(y=error_lin_reg_test, c='g', dashes=(5,1), label="Lin Reg RMSE")
+
+ax2.set_xlabel('K')
+ax2.set_ylabel('RMSE')
+ax2.legend(loc='upper left')
 matplotlib.pyplot.show()
 
 # to plot this data, take from https://scikit-learn.org/stable/auto_examples/neighbors/plot_regression.html
@@ -72,15 +102,15 @@ n_neighbors = 5
 
 X = x_i.reshape(-1, 1)
 y = y_i.reshape(-1, 1)
-T = x_i.reshape(-1, 1)
+T = x_i_test.reshape(-1, 1)
 # for i, weights in enumerate(['uniform', 'distance']):
 for i, n_neighbors in enumerate([2, 5, 10, 12]):
     knn = neighbors.KNeighborsRegressor(n_neighbors, weights='uniform')
-    y_ = knn.fit(X, y).predict(X)  # changed from T to X
+    y_ = knn.fit(X, y).predict(T)  # changed from T to X
     matplotlib.pyplot.subplot(4, 1, i + 1)
     matplotlib.pyplot.scatter(x_i_test.reshape(-1, 1),y_i_test.reshape(-1,1), c='grey', label='test data')
     matplotlib.pyplot.scatter(X, y, c='k', label='training data')
-    matplotlib.pyplot.plot(X,y_, c='g', label='prediction')  # changed from T to X
+    matplotlib.pyplot.plot(T,y_, c='g', label='prediction')  # changed from T to X
     matplotlib.pyplot.axis('tight')
     matplotlib.pyplot.legend()
     matplotlib.pyplot.title("KNeighborsRegressor (k = %i, weights = '%s')" % (n_neighbors,
