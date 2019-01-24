@@ -137,9 +137,18 @@ y_i_sin, y_i_test_sin = numpy.sin(2 * x_i) + 2 + e_i, \
 # placeholder for loop that will generate 20 different models for 2.8. Models will then be passed into function.
 
 
-# true function points
+# Plot actual function
 # ################################################
-true_func_y_vals = 1.8 * true_func_x_vals + 2  # Grid of 0.01 spacing from -1 to 1
-true_func_y_vals_tan = 1.8 * true_func_x_vals + 2  # Grid of 0.01 spacing from -1 to 1
-true_func_y_vals_sin = 1.8 * true_func_x_vals + 2  # Grid of 0.01 spacing from -1 to 1
-true_func_y_vals_sin_poly = 1.8 * true_func_x_vals + 2  # Grid of 0.01 spacing from -1 to 1
+true_func_y_vals = 1.8 * true_func_x_vals + 2
+true_func_y_vals_tan = 1.8 * true_func_x_vals + 2
+true_func_y_vals_sin = 1.8 * true_func_x_vals + 2
+true_func_y_vals_sin_poly = 1.8 * true_func_x_vals + 2
+
+# 2.1-2.5
+eval_Knn_Performance(y_i=y_i_linear, y_i_test=y_i_test_linear, true_fx_yvals_train=true_func_y_vals)
+# 2.6
+eval_Knn_Performance(y_i=y_i_tan, y_i_test=y_i_test_linear, true_fx_yvals_train=true_func_y_vals)
+# 2.7
+eval_Knn_Performance(y_i=y_i_sin, y_i_test=y_i_test_linear, true_fx_yvals_train=true_func_y_vals)
+# 2.8
+eval_Knn_Performance(y_i=y_i_linear, y_i_test=y_i_test_linear, true_fx_yvals_train=true_func_y_vals)
