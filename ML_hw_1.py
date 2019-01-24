@@ -107,10 +107,10 @@ def eval_Knn_Performance(var_list):
         plt.axis('tight')
         plt.legend()
         plt.title("KNeighborsRegressor (k = %i, weights = '%s')" % (n_neighbors,
-                                                                                  'uniform'))
+                                                                    'uniform'))
         # plot f(x) for comparison
         plt.plot(true_fx_x_vals, true_fx_y_vals, 'r--',
-                               label='f')  # Create line plot with yvals against xvals
+                 label='f')  # Create line plot with yvals against xvals
 
     plt.tight_layout()
     plt.show(block=True)
@@ -136,8 +136,8 @@ true_func_y_vals_sin_poly = 1.8 * true_func_x_vals + 2  # placeholder for eventu
 # y variable creation
 # ################################################
 arr = []  # 0=y_i, 1=y_i_test, 2=true_fx_yvals_train, 3=operation 4=x_i_p, 5=x_i_p_test
-# arr.append((1.8 * x_i + 2 + e_i, 1.8 * x_i_test + 2 + e_i_test, true_func_y_vals_lin, 'Linear Reg'))
-# arr.append((np.tan(1.1 * x_i) + 2 + e_i, np.tan(1.1 * x_i_test) + 2 + e_i_test, true_func_y_vals_tan, 'Tan Func'))
+arr.append((1.8 * x_i + 2 + e_i, 1.8 * x_i_test + 2 + e_i_test, true_func_y_vals_lin, 'Linear Reg'))
+arr.append((np.tan(1.1 * x_i) + 2 + e_i, np.tan(1.1 * x_i_test) + 2 + e_i_test, true_func_y_vals_tan, 'Tan Func'))
 arr.append((np.sin(2 * x_i) + 2 + e_i, np.sin(2 * x_i_test) + 2 + e_i_test, true_func_y_vals_sin, 'Sin Func'))
 # (y_i_sin_poly, y_i_test_sin_poly) = (np.sin(2 * x_i) + 2 + e_i,np.sin(2 * x_i_test) + 2 + e_i_test)
 
