@@ -123,6 +123,14 @@ e_i, e_i_test = numpy.random.normal(0, 1, 100), \
 
 true_func_x_vals = numpy.linspace(-1, 1, 10000)
 
+# Plot actual function
+# ################################################
+true_func_y_vals = 1.8 * true_func_x_vals + 2
+true_func_y_vals_tan = numpy.tan(1.1 * true_func_x_vals) + 2
+true_func_y_vals_sin = numpy.sin(2 * true_func_x_vals) + 2
+true_func_y_vals_sin_poly = 1.8 * true_func_x_vals + 2  # placeholder for eventual polynomial func
+
+
 # y variable creation
 # ################################################
 y_i_linear, y_i_test_linear = 1.8 * x_i + 2 + e_i, \
@@ -137,12 +145,6 @@ y_i_sin, y_i_test_sin = numpy.sin(2 * x_i) + 2 + e_i, \
 # placeholder for loop that will generate 20 different models for 2.8. Models will then be passed into function.
 
 
-# Plot actual function
-# ################################################
-true_func_y_vals = 1.8 * true_func_x_vals + 2
-true_func_y_vals_tan = 1.8 * true_func_x_vals + 2
-true_func_y_vals_sin = 1.8 * true_func_x_vals + 2
-true_func_y_vals_sin_poly = 1.8 * true_func_x_vals + 2
 
 # 2.1-2.5
 eval_Knn_Performance(y_i=y_i_linear, y_i_test=y_i_test_linear, true_fx_yvals_train=true_func_y_vals)
