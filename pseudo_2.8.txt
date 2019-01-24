@@ -1,0 +1,18 @@
+#for 2.8 p=1 is same code and graphs from 2.7
+# now we keep same x_i from 2.7 and use loop to build array for 2.8, but set p=2
+
+x_i_p2 = x_i.append(additional column of 100 observations created same way as for x_i) # now P=2
+# x_i_p2 = x_i.append(numpy.sort(numpy.random.uniform(-1, 1, 100), axis=0)) # naive guess at how this looks
+
+pass x_i_p2 into same function that creates and evaluates our earlier knn models
+FitKnn(x_i_p2,y_i) # now fit KNN model on same y_i from 2.7, but larger x_i_p2 array
+Plot graphs of RMSE and performance vs linear
+
+#complete current iteration of loop and increment p to p=3 (we complete up to p=20)
+
+#create x_i_p3
+x_i_p3 = x_i_p2.append(additional column of 100 observations to x_i_p2) # now P=3
+
+pass x_i_p3 into same function that creates and evaluates our earlier knn models
+FitKnn(x_i_p3,y_i) # now fit model on same y_i, but larger x_i_p3 array
+Plot graphs of RMSE and performance vs linear
