@@ -118,10 +118,33 @@ pc_obj = get_PC(3, purchaseCounts, xcols)
 customer_clusters = pd.concat(
     [
         pc_obj.data.loc[:, ["cust_name"]],
-        clust_obj.predicted_clusters.loc[:, ["cluster"]],
-        pc_obj.PC_values,
+        clust_obj.predicted_clusters.loc[:, ["cluster"]],  # values not nans, but being concatenated as NANs
+        pc_obj.PC_values,                                  # values not nans, but being concatenated as NANs
     ]
 )
+#debugging 
+# pc_obj.PC_values.head
+# >>> clust_obj.predicted_clusters.loc[:, ["cluster"]].head()  # values not nans, but being concatenated as NANs
+# deal_id  cluster
+# 0              6
+# 1              2
+# 2              5
+# 3              6
+# 4              2 
+# >>> pc_obj.PC_values.head()
+# deal_id  xprincomp__1  xprincomp__2  xprincomp__3  # values not nans, but being concatenated as NANs
+# 0            1.007580      0.108215      0.545614
+# 1           -0.287539      0.044715     -0.044072
+# 2           -0.392032      1.038391     -0.266342
+# 3            0.699477     -0.022542      0.133556
+# 4            0.088183     -0.471695     -0.777541
+# >>> customer_clusters.head()  # values not nans, but being concatenated as NANs
+#    cluster cust_name  xprincomp__1  xprincomp__2  xprincomp__3
+# 0      NaN     Adams           NaN           NaN           NaN
+# 1      NaN     Allen           NaN           NaN           NaN
+# 2      NaN  Anderson           NaN           NaN           NaN
+# 3      NaN    Bailey           NaN           NaN           NaN
+# 4      NaN     Baker           NaN           NaN           NaN
 
 df_combined = pd.merge(df_cust, customer_clusters)
 df_combined = pd.merge(df_deals, df_combined)
