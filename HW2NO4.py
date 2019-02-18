@@ -123,7 +123,6 @@ customer_clusters = pd.concat(
     ]
 )
 #debugging 
-# pc_obj.PC_values.head
 # >>> clust_obj.predicted_clusters.loc[:, ["cluster"]].head()  # values not nans, but being concatenated as NANs
 # deal_id  cluster
 # 0              6
