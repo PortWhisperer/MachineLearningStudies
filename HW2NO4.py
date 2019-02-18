@@ -30,13 +30,19 @@ class get_PC:  # generates the principal components for a dataset
         for pc in range(num_components):  # add PC values to the dataframe
             data["xprincomp__" + str(pc + 1)] = pca.fit_transform(data[xcols])[:, pc]
         data.reset_index()
-        print("Principal component altered")
         self.PC_values = data
+        print("Principal component altered")
 
     def get_PC_variances(self):
         self.variances = np.var(self.PC_values.filter(regex="xprincomp__"), axis=0)
-        self.variance_ratos = self.variances / np.sum(self.variances)
-        print(self.variances, "\n", self.variance_ratos)
+        self.variance_ratios = self.variances / np.sum(self.variances)
+        print(self.variances, self.variance_ratios)
+        return (
+            "PC# vs variance of y accounted for:",
+            self.variances,
+            "PCs ratio  of y accounted for:",
+            self.variance_ratios,
+        )
 
 
 class cluster_Data:  # fit K-means object to data
@@ -113,23 +119,27 @@ clust_obj = cluster_Data(7, purchaseCounts, xcols)
 
 
 # customer_clusters = purchaseCounts[["cust_name", "cluster", "x", "y", "z"]]
-pc_obj = get_PC(3, purchaseCounts, xcols)
+pc_obj2 = get_PC(3, purchaseCounts, xcols)
+pc_obj2 = get_PC(3, purchaseCounts, xcols)
+pc_obj2 = get_PC(3, purchaseCounts, xcols)
 # customer_clusters = purchaseCounts[["cust_name", "cluster", "xprincomp__1", "xprincomp__2", "xprincomp__3"]]
 customer_clusters = pd.concat(
     [
         pc_obj.data.loc[:, ["cust_name"]],
-        clust_obj.predicted_clusters.loc[:, ["cluster"]],  # values not nans, but being concatenated as NANs
-        pc_obj.PC_values,                                  # values not nans, but being concatenated as NANs
-    ]
+        clust_obj.predicted_clusters.loc[:, ["cluster"]],
+        pc_obj.PC_values,
+    ],
+    axis=1,
 )
-#debugging 
+
+# debugging
 # >>> clust_obj.predicted_clusters.loc[:, ["cluster"]].head()  # values not nans, but being concatenated as NANs
 # deal_id  cluster
 # 0              6
 # 1              2
 # 2              5
 # 3              6
-# 4              2 
+# 4              2
 # >>> pc_obj.PC_values.head()
 # deal_id  xprincomp__1  xprincomp__2  xprincomp__3  # values not nans, but being concatenated as NANs
 # 0            1.007580      0.108215      0.545614
@@ -148,9 +158,8 @@ customer_clusters = pd.concat(
 df_combined = pd.merge(df_cust, customer_clusters)
 df_combined = pd.merge(df_deals, df_combined)
 
-ggplot(df_combined, aes(x='xprincomp__1', y='xprincomp__2',color='cluster')) + \
-geom_point(size=75) + \
-ggtitle("Customers Grouped by Cluster")
+pc_obj.get_PC_variances()
+
 
 # ggplot(df_combined, aes(x='x', y='y', color='cluster')) + \
 # geom_point(size=75) + \
