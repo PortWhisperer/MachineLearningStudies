@@ -9,8 +9,10 @@ from ggplot import ggplot
 import plotly.plotly as py
 import plotly
 
-plotly.tools.set_credentials_file(username='frag3stream5', api_key='4uHUX2INKuaG2egm2B8h')
- 
+plotly.tools.set_credentials_file(
+    username="frag3stream5", api_key="4uHUX2INKuaG2egm2B8h"
+)
+
 
 class get_PC:  # generates the principal components for a dataset
     def __init__(
@@ -137,30 +139,34 @@ customer_clusters = pd.concat(
 
 
 scatter = dict(
-    mode = "markers",
-    name = "y",
-    type = "scatter3d",    
-    x = pc_obj.PC_values.iloc[:,0], y = pc_obj.PC_values.iloc[:,1], z = pc_obj.PC_values.iloc[:,2],
-    marker = dict( size=2, color="rgb(23, 190, 207)" )
+    mode="markers",
+    name="y",
+    type="scatter3d",
+    x=pc_obj.PC_values.iloc[:, 0],
+    y=pc_obj.PC_values.iloc[:, 1],
+    z=pc_obj.PC_values.iloc[:, 2],
+    marker=dict(size=2, color="rgb(23, 190, 207)"),
 )
 clusters = dict(
-    alphahull = 7,
-    name = "y",
-    opacity = 0.1,
-    type = "mesh3d",    
-    x = pc_obj.PC_values.iloc[:,0], y = pc_obj.PC_values.iloc[:,1], z = pc_obj.PC_values.iloc[:,2],
+    alphahull=7,
+    name="y",
+    opacity=0.1,
+    type="mesh3d",
+    x=pc_obj.PC_values.iloc[:, 0],
+    y=pc_obj.PC_values.iloc[:, 1],
+    z=pc_obj.PC_values.iloc[:, 2],
 )
 layout = dict(
-    title = '3d point clustering',
-    scene = dict(
-        xaxis = dict( zeroline=False ),
-        yaxis = dict( zeroline=False ),
-        zaxis = dict( zeroline=False ),
-    )
+    title="3d point clustering",
+    scene=dict(
+        xaxis=dict(zeroline=False),
+        yaxis=dict(zeroline=False),
+        zaxis=dict(zeroline=False),
+    ),
 )
-fig = dict( data=[scatter, clusters], layout=layout )
+fig = dict(data=[scatter, clusters], layout=layout)
 # Use py.iplot() for IPython notebook
-plotly.offline.plot(fig, filename='3d point clustering')
+plotly.offline.plot(fig, filename="3d point clustering")
 
 df_combined = pd.merge(df_cust, customer_clusters)
 df_combined = pd.merge(df_deals, df_combined)
@@ -169,19 +175,14 @@ pc_obj.get_PC_variances()
 
 import plotly.graph_objs as go
 
-d  = {'x': [1, 2, 3], 'y': [3, 4, 5], 'z': ['A', 'B', 'A']}
+d = {"x": [1, 2, 3], "y": [3, 4, 5], "z": ["A", "B", "A"]}
 df = pd.DataFrame(data=d)
 
-colorsIdx = {'A': 'rgb(215,48,39)', 'B': 'rgb(215,148,39)'}
-cols      = df['z'].map(colorsIdx)
+colorsIdx = {"A": "rgb(215,48,39)", "B": "rgb(215,148,39)"}
+cols = df["z"].map(colorsIdx)
 
 # Create a trace
-trace = go.Scatter(
-    x = df.x,
-    y = df.y,
-    mode = 'markers',
-    marker=dict(size=15, color=cols)
-)
+trace = go.Scatter(x=df.x, y=df.y, mode="markers", marker=dict(size=15, color=cols))
 
 data = [trace]
 py.iplot(data)
@@ -216,4 +217,3 @@ py.iplot(data)
 # ax.set_zlabel('Z Label')
 
 # plt.show()
-
