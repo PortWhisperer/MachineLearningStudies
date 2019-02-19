@@ -1,19 +1,15 @@
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-from pandas import DataFrame as df
 from pandas import read_csv
 import numpy as np
-import pandas as pd  # version 0.23.4
-from matplotlib import pyplot as plt
-from ggplot import ggplot
-import plotly.plotly as py
+import pandas as pd
+
+# from ggplot import ggplot
 import plotly
-
-plotly.tools.set_credentials_file(
-    username="frag3stream5", api_key="4uHUX2INKuaG2egm2B8h"
-)
+import random
 
 
+# define some classes useful for K-Means and Principal component analysis
 class get_PC:  # generates the principal components for a dataset
     def __init__(
         self, num_components, data, xcols
@@ -38,7 +34,9 @@ class get_PC:  # generates the principal components for a dataset
         self.PC_values = data
         print("Principal component altered")
 
-    def get_PC_variances(self):
+    def get_PC_variances(
+        self
+    ):  # this method allows analyizing principal component performance
         self.variances = np.var(self.PC_values.filter(regex="xprincomp__"), axis=0)
         self.variance_ratios = self.variances / np.sum(self.variances)
         print(self.variances, self.variance_ratios)
@@ -99,7 +97,7 @@ df_cust["times_purchased"] = 1  # initializes times_purchased to 1 for all custo
 df_combined = pd.merge(df_deals, df_cust)
 
 # below number of purchases is examined
-# instead of number of purchases, we can also look at how many purcheses
+# instead of number of purchases, we can also look at how many purchases
 # were "Past_Peak" and then cluster on that. Less interpretable?
 # could just use customer name and map to quartile
 # of how many past peak/pre-peak buys vs the group
@@ -113,31 +111,31 @@ purchaseCounts = purchaseCounts.fillna(0).reset_index()
 xcols = purchaseCounts.columns[1:]
 
 clust_obj = cluster_Data(7, purchaseCounts, xcols)
+pc_obj = get_PC(3, purchaseCounts, xcols)  # hard-code to 3 principal components
 
-# value used for plotting
-# purchaseCounts["cluster"] = clust_obj.predicted_clusters
+# get each customer's k-means cluster assignment which we'll need for plotting purposes
+cluster_labels = {
+    "cluster" + str(int(i) + 1): i[0]
+    for i in clust_obj.predicted_clusters[["cluster"]].values[
+        range(len(clust_obj.predicted_clusters))
+    ]
+}
 
+# dynamically create colors that we'll later map to each cluster
+color = [
+    "#" + "".join([random.choice("0123456789ABCDEF") for j in range(6)])
+    for i in range(len(cluster_labels))
+]
 
-# ggplot(purchaseCounts, aes(x="factor(cluster)")) + geom_bar() + xlab("Cluster") + ylab(
-#     "Customers\n(# in cluster)"
-# )
-
-
-# customer_clusters = purchaseCounts[["cust_name", "cluster", "x", "y", "z"]]
-pc_obj = get_PC(3, purchaseCounts, xcols)
-pc_obj2 = get_PC(3, purchaseCounts, xcols)
-pc_obj3 = get_PC(3, purchaseCounts, xcols)
-# customer_clusters = purchaseCounts[["cust_name", "cluster", "xprincomp__1", "xprincomp__2", "xprincomp__3"]]
-customer_clusters = pd.concat(
-    [
-        pc_obj.data.loc[:, ["cust_name"]],
-        clust_obj.predicted_clusters.loc[:, ["cluster"]],
-        pc_obj.PC_values,
-    ],
-    axis=1,
+# map randomly generated colors to each cluster.
+# color choices are random, so some can be more difficult to see. Re-run or
+# increase `size`  in `scatter` below to ease visualization
+colorsIdx = {clust: color for clust, color in zip(cluster_labels.values(), color)}
+cols = clust_obj.predicted_clusters["cluster"].map(
+    {clust: color for clust, color in zip(cluster_labels.values(), color)}
 )
 
-
+# assign hyper-parameters of 3d cluster plot
 scatter = dict(
     mode="markers",
     name="y",
@@ -145,7 +143,7 @@ scatter = dict(
     x=pc_obj.PC_values.iloc[:, 0],
     y=pc_obj.PC_values.iloc[:, 1],
     z=pc_obj.PC_values.iloc[:, 2],
-    marker=dict(size=2, color="rgb(23, 190, 207)"),
+    marker=dict(size=2, color=cols),
 )
 clusters = dict(
     alphahull=7,
@@ -164,28 +162,33 @@ layout = dict(
         zaxis=dict(zeroline=False),
     ),
 )
+
+# plot the data
 fig = dict(data=[scatter, clusters], layout=layout)
-# Use py.iplot() for IPython notebook
 plotly.offline.plot(fig, filename="3d point clustering")
 
-df_combined = pd.merge(df_cust, customer_clusters)
-df_combined = pd.merge(df_deals, df_combined)
 
-pc_obj.get_PC_variances()
+# create a histogram with number of customers per cluster
+# purchaseCounts["cluster"] = clust_obj.predicted_clusters
+# ggplot(purchaseCounts, aes(x="factor(cluster)")) + geom_bar() + xlab("Cluster") + ylab(
+#     "Customers\n(# in cluster)"
+# )
 
-import plotly.graph_objs as go
 
-d = {"x": [1, 2, 3], "y": [3, 4, 5], "z": ["A", "B", "A"]}
-df = pd.DataFrame(data=d)
-
-colorsIdx = {"A": "rgb(215,48,39)", "B": "rgb(215,148,39)"}
-cols = df["z"].map(colorsIdx)
-
-# Create a trace
-trace = go.Scatter(x=df.x, y=df.y, mode="markers", marker=dict(size=15, color=cols))
-
-data = [trace]
-py.iplot(data)
+# this code not needed for 3d cluster graph
+# is used for 2d cluster graph, and
+# later on for deeper analysis of the clusters' behavior
+# customer_clusters = pd.concat(
+#     [
+#         pc_obj.data.loc[:, ["cust_name"]],
+#         clust_obj.predicted_clusters.loc[:, ["cluster"]],
+#         pc_obj.PC_values,
+#     ],
+#     axis=1,
+# )
+#
+# df_combined = pd.merge(df_cust, customer_clusters)
+# df_combined = pd.merge(df_deals, df_combined)
 
 # ggplot(df_combined, aes(x='x', y='y', color='cluster')) + \
 # geom_point(size=75) + \
@@ -196,24 +199,5 @@ py.iplot(data)
 #     cluster_of_interest='is_'+str(i)
 #     df_combined[cluster_of_interest] = df_combined.cluster == i
 #     print(df_combined.groupby(cluster_of_interest).Varietal.value_counts())
-#     print(df_combined.groupby(cluster_of_interest)[['MinQty', 'Discount']].mean())
-
-
-# plot_ly(x=temp, y=pressure, z=dtime, type="scatter3d", mode="markers", color=temp)
-
-
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-
-# x =[1,2,3,4,5,6,7,8,9,10]
-# y =[5,6,2,3,13,4,1,2,4,8]
-# z =[2,3,3,3,5,7,9,11,9,10]
-
-
-# ax.scatter(x, y, z, c='r', marker='o')
-
-# ax.set_xlabel('X Label')
-# ax.set_ylabel('Y Label')
-# ax.set_zlabel('Z Label')
-
-# plt.show()
+#     print(df_combined.groupby(clus
+# ter_of_interest)[['MinQty', 'Discount']].mean())
