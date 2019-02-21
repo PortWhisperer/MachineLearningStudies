@@ -130,7 +130,7 @@ color = [
 # map randomly generated colors to each cluster.
 # color choices are random, so some can be more difficult to see. Re-run or
 # increase `size`  in `scatter` below to ease visualization
-colorsIdx = {clust: color for clust, color in zip(cluster_labels.values(), color)}
+
 cols = clust_obj.predicted_clusters["cluster"].map(
     {clust: color for clust, color in zip(cluster_labels.values(), color)}
 )
