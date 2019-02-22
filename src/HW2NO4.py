@@ -3,6 +3,8 @@ from sklearn.decomposition import PCA
 from pandas import read_csv
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt  # for corr and heatmaps
+import seaborn as sns
 
 # from ggplot import ggplot
 import plotly
@@ -14,16 +16,15 @@ class get_PC:  # generates the principal components for a dataset
     def __init__(
         self, num_components, data, xcols
     ):  # xcols can change per dataset/x var
-        self.data = data
+        self.data = data.copy()
         self.xcols = xcols
-        self.pca_obj, pca = (
-            PCA(n_components=num_components),
-            PCA(n_components=num_components),
-        )
         pca = PCA(n_components=num_components)  # instantiate PC object
         for pc in range(num_components):  # add PC values to the dataframe
             data["xprincomp__" + str(pc + 1)] = pca.fit_transform(data[xcols])[:, pc]
         data.reset_index()
+        self.components = pca.fit(
+            self.data[xcols]
+        ).components_  # used for heat_map. may create separate method.
         self.reshaped_data = data
         self.PC_values = data.filter(regex="xprincomp__")  # get cols of PC values
         print("Successfully calculated principal components")
@@ -55,7 +56,7 @@ class get_PC:  # generates the principal components for a dataset
 class cluster_Data:  # fit K-means object to data
     def __init__(self, num_clusters, data, xcols):
         self.num_clusters = num_clusters
-        self.data = data
+        self.data = data.copy()
         self.xcols = xcols
         cluster = KMeans(n_clusters=num_clusters)
         # slice matrix so we only use the 0/1 indicator columns for clustering
@@ -147,7 +148,7 @@ scatter = dict(
     x=pc_obj.PC_values.iloc[:, 0],
     y=pc_obj.PC_values.iloc[:, 1],
     z=pc_obj.PC_values.iloc[:, 2],
-    marker=dict(size=2, color=cols),
+    marker=dict(size=4, color=cols),
 )
 clusters = dict(
     alphahull=7,
@@ -169,7 +170,7 @@ layout = dict(
 
 # plot the data
 fig = dict(data=[scatter, clusters], layout=layout)
-plotly.offline.plot(fig, filename="3d point clustering")
+# plotly.offline.plot(fig, filename="3d point clustering")
 
 
 # create a histogram with number of customers per cluster
@@ -205,3 +206,37 @@ plotly.offline.plot(fig, filename="3d point clustering")
 #     print(df_combined.groupby(cluster_of_interest).Varietal.value_counts())
 #     print(df_combined.groupby(clus
 # ter_of_interest)[['MinQty', 'Discount']].mean())
+
+# +++++++++++++++++++++++++++++++++++++++
+# + visualize the effect of PCA - actually this is visualizing effect of each var according to each PC
+# +++++++++++++++++++++++++++++++++++++++
+
+
+plt.matshow(pc_obj.components, cmap="viridis")
+plt.yticks([0, 1, 2], ["1st Comp", "2nd Comp", "3rd Comp"], fontsize=10)
+plt.colorbar()
+plt.xticks(
+    range(len(clust_obj.data.columns[1:])),
+    clust_obj.data.columns[1:],
+    rotation=65,
+    ha="left",
+)
+# plt.tight_layout()
+plt.show()  # since the direction of the arrow doesn't matter in pca plot, it can be concluded that the features have a strong correlation
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + finally check the correlation of the features
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# correlation = cancer.feature_.corr()
+
+s = sns.heatmap(
+    clust_obj.data[1:].corr(), cmap="coolwarm"
+)  # fantastic tool to study the features
+s.set_yticklabels(s.get_yticklabels(), rotation=30, fontsize=7)
+s.set_xticklabels(s.get_xticklabels(), rotation=30, fontsize=7)
+plt.show()  # super happy to complete this project
+
+
+# finished
