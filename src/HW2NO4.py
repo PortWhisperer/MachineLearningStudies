@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt  # for corr and heatmaps
 import seaborn as sns
-
 # from ggplot import ggplot
 import plotly
 import random
@@ -170,7 +169,7 @@ layout = dict(
 
 # plot the data
 fig = dict(data=[scatter, clusters], layout=layout)
-# plotly.offline.plot(fig, filename="3d point clustering")
+plotly.offline.plot(fig, filename="3d point clustering")
 
 
 # create a histogram with number of customers per cluster
