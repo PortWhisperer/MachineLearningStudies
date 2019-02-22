@@ -16,6 +16,10 @@ class get_PC:  # generates the principal components for a dataset
     ):  # xcols can change per dataset/x var
         self.data = data
         self.xcols = xcols
+        self.pca_obj, pca = (
+            PCA(n_components=num_components),
+            PCA(n_components=num_components),
+        )
         pca = PCA(n_components=num_components)  # instantiate PC object
         for pc in range(num_components):  # add PC values to the dataframe
             data["xprincomp__" + str(pc + 1)] = pca.fit_transform(data[xcols])[:, pc]
